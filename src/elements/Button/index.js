@@ -18,7 +18,6 @@ export default function Button(props) {
     if (props.isDisabled) className.push("disabled");
     return (
       <span className={className.join(" ")} style={props.style}>
-        {" "}
         {props.isLoading ? (
           <>
             <span className="spinner-border spinner-border-sm mx-5"> </span>{" "}
@@ -26,7 +25,7 @@ export default function Button(props) {
           </>
         ) : (
           props.children
-        )}{" "}
+        )}
       </span>
     );
   }
@@ -41,7 +40,7 @@ export default function Button(props) {
           target={props.target === "_blank" ? " _blank" : undefined}
           rel={props.target === "_blank" ? "noopener noreferrer" : undefined}
         >
-          {props.children}{" "}
+          {props.children}
         </a>
       );
     } else {
@@ -52,7 +51,7 @@ export default function Button(props) {
           style={props.style}
           onClick={onClick}
         >
-          {props.children}{" "}
+          {props.children}
         </Link>
       );
     }
@@ -63,7 +62,7 @@ export default function Button(props) {
       style={props.style}
       onClick={onClick}
     >
-      {props.children}{" "}
+      {props.children}
     </button>
   );
 }
