@@ -7,6 +7,7 @@ import Testimony from "parts/Testimony";
 
 import landingPage from "json/landingPage.json";
 
+
 export default class LandingPage extends Component {
   constructor(props) {
     super(props);
@@ -22,7 +23,7 @@ export default class LandingPage extends Component {
           refMostPicked={this.refMostPicked}
           data={landingPage.mostPicked}
         />
-        <Categories data={landingPage.categories} />
+        <Categories />
         <Testimony data={landingPage.testimonial} />
       </>
     );
