@@ -5,7 +5,6 @@ import Breadcrumb from "elements/BreadCrumb";
 import InputSelect from "elements/Form/InputSelect";
 import axios from "axios";
 
-
 export default class CbfForm extends Component {
   constructor(props) {
     super(props);
@@ -19,7 +18,7 @@ export default class CbfForm extends Component {
     };
   }
 
-   componentDidMount() {
+  componentDidMount() {
     axios
       .get("http://localhost:3000/Api/TypeWisata")
       .then((res) => {
@@ -77,7 +76,8 @@ export default class CbfForm extends Component {
   };
 
   render() {
-    const { typeInput, types, typeOptions, recommendations, loading, error } = this.state;
+    const { typeInput, types, typeOptions, recommendations, loading, error } =
+      this.state;
     const breadcrumb = [
       { pageTitle: "Home", pageHref: "/" },
       { pageTitle: "CBF Algorithm", pageHref: "" },
@@ -140,7 +140,6 @@ export default class CbfForm extends Component {
               </span>
             ))}
           </div>
-          
         </form>
 
         {/* Show loading/error */}
@@ -157,7 +156,10 @@ export default class CbfForm extends Component {
                   key={`item-${item.type}-item-${item.NamaTempat}`}
                 >
                   <div className="card">
-                    <div className="mb-3 font-weight-medium" style={{ width: "fit-content" }}>
+                    <div
+                      className="mb-3 font-weight-medium"
+                      style={{ width: "fit-content" }}
+                    >
                       {item.type}
                     </div>
                     {item.similarity >= 1 && (
@@ -166,7 +168,10 @@ export default class CbfForm extends Component {
                       </div>
                     )}
                     {item.similarity < 1 && (
-                      <div className="tag" style={{ backgroundColor: "#ffe4c4"}}>
+                      <div
+                        className="tag"
+                        style={{ backgroundColor: "#ffe4c4" }}
+                      >
                         Good <span className="font-weight-light">Choice</span>
                       </div>
                     )}

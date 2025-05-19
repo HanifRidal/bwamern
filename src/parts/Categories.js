@@ -39,9 +39,12 @@ const PemesanList = () => {
               key={`item-${item.type}-item-${item.NamaTempat}`}
             >
               <div className="card">
-                <div className="mb-3 font-weight-medium" style={{ width: "fit-content" }}>
-                {item.type}
-              </div>
+                <div
+                  className="mb-3 font-weight-medium"
+                  style={{ width: "fit-content" }}
+                >
+                  {item.type}
+                </div>
                 {item.Ispopular && (
                   <div className="tag">
                     Popular <span className="font-weight-light">Choice</span>
@@ -62,9 +65,7 @@ const PemesanList = () => {
                   >
                     <h5 className="h4">{item.NamaTempat}</h5>
                   </Button>
-                  <span className="text-gray-500">
-                    {item.Kota}, Indonesia
-                  </span>
+                  <span className="text-gray-500">{item.Kota}, Indonesia</span>
                 </div>
               </div>
             </div>
@@ -74,6 +75,5 @@ const PemesanList = () => {
     </div>
   );
 };
-
 
 export default PemesanList;
