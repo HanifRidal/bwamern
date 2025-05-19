@@ -10,7 +10,7 @@ const PemesanList = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/Api/wisata");
+        const response = await axios.get("http://localhost:3000/Api/Wisata/Type");
         setPemesan(response.data.data);
       } catch (error) {
         setError(error);
@@ -49,7 +49,7 @@ const PemesanList = () => {
                 )}
                 <figure className="img-wrapper" style={{ height: 180 }}>
                   <img
-                    src={item.Url_1 || ""}
+                    src={item.ImgUrl || ""}
                     alt={item.Kota}
                     className="img-cover"
                   />
