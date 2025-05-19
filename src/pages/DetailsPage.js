@@ -10,7 +10,7 @@ import PageDetailDescription from "parts/PageDetailDescription";
 import Categories from "parts/Categories";
 import Testimony from "parts/Testimony";
 import Footer from "parts/Footer";
-import BookingForm from "parts/BookingForm";
+// import BookingForm from "parts/BookingForm";
 
 export default class DetailsPage extends Component {
   componentDidMount() {
