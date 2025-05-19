@@ -3,15 +3,8 @@ import React, { Component } from "react";
 import Button from "elements/Button";
 import Breadcrumb from "elements/BreadCrumb";
 import InputSelect from "elements/Form/InputSelect";
+import axios from "axios";
 
-const TYPE_OPTIONS = [
-  "Historical",
-  "Beach",
-  "Mountain",
-  "City",
-  "Village",
-  "Adventure",
-];
 
 export default class CbfForm extends Component {
   constructor(props) {
@@ -19,7 +12,27 @@ export default class CbfForm extends Component {
     this.state = {
       typeInput: "",
       types: [],
+      typeOptions: [],
+      recommendations: [],
+      loading: false,
+      error: null,
     };
+  }
+
+   componentDidMount() {
+    axios
+      .get("http://localhost:3000/Api/TypeWisata")
+      .then((res) => {
+        if (res.data && Array.isArray(res.data.data)) {
+          this.setState({
+            typeOptions: res.data.data.map((item) => item.type),
+          });
+        }
+      })
+      .catch((err) => {
+        // Optionally handle error
+        console.error(err);
+      });
   }
 
   handleInputChange = (e) => {
@@ -44,11 +57,27 @@ export default class CbfForm extends Component {
 
   handleSubmit = (e) => {
     e.preventDefault();
-    alert(JSON.stringify({ type: this.state.types }));
+    this.setState({ loading: true, error: null });
+    axios
+      .post("http://localhost:3000/Api/recommendations", {
+        type: this.state.types,
+      })
+      .then((res) => {
+        this.setState({
+          recommendations: res.data.data || [],
+          loading: false,
+        });
+      })
+      .catch((err) => {
+        this.setState({
+          error: err.message,
+          loading: false,
+        });
+      });
   };
 
   render() {
-    const { typeInput, types } = this.state;
+    const { typeInput, types, typeOptions, recommendations, loading, error } = this.state;
     const breadcrumb = [
       { pageTitle: "Home", pageHref: "/" },
       { pageTitle: "CBF Algorithm", pageHref: "" },
@@ -82,7 +111,7 @@ export default class CbfForm extends Component {
               value={typeInput}
               onChange={this.handleInputChange}
               placeholder="Select type vacation"
-              options={TYPE_OPTIONS}
+              options={typeOptions}
             />
             <Button
               className="btn ml-4"
@@ -111,16 +140,61 @@ export default class CbfForm extends Component {
               </span>
             ))}
           </div>
-          <Button
-            className="btn px-5"
-            hasShadow
-            isPrimary
-            // type="submit"
-            style={{ marginTop: "16px", justifyContent: "center" }}
-          >
-            Submit the Reference
-          </Button>
+          
         </form>
+
+        {/* Show loading/error */}
+        {loading && <div>Loading recommendations...</div>}
+        {error && <div style={{ color: "red" }}>Error: {error}</div>}
+
+        {/* Show recommendations */}
+        {recommendations.length > 0 && (
+          <div className="container mt-4">
+            <div className="row">
+              {recommendations.map((item) => (
+                <div
+                  className="item column-3 row-1 col-md-4 mb-4"
+                  key={`item-${item.type}-item-${item.NamaTempat}`}
+                >
+                  <div className="card">
+                    <div className="mb-3 font-weight-medium" style={{ width: "fit-content" }}>
+                      {item.type}
+                    </div>
+                    {item.similarity >= 1 && (
+                      <div className="tag">
+                        Best <span className="font-weight-light">Choice</span>
+                      </div>
+                    )}
+                    {item.similarity < 1 && (
+                      <div className="tag" style={{ backgroundColor: "#ffe4c4"}}>
+                        Good <span className="font-weight-light">Choice</span>
+                      </div>
+                    )}
+                    <figure className="img-wrapper" style={{ height: 180 }}>
+                      <img
+                        src={item.ImgUrl || ""}
+                        alt={item.Kota}
+                        className="img-cover"
+                      />
+                    </figure>
+                    <div className="meta-wrapper">
+                      <Button
+                        type="link"
+                        className="stretched-link d-block text-gray-800"
+                        href={`/properties/${item.id_paket}`}
+                      >
+                        <h5 className="h4">{item.NamaTempat}</h5>
+                      </Button>
+                      <span className="text-gray-500">
+                        {item.Kota}, Indonesia
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </section>
     );
   }

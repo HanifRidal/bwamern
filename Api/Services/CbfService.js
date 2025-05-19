@@ -24,7 +24,7 @@ async function recommendSpots(userPreferences) {
   recommendations.sort((a, b) => b.similarity - a.similarity);
 
   // Return top 5
-  return recommendations.slice(0, 5);
+  return recommendations.slice(0, 8);
 }
 
 module.exports = { recommendSpots };
