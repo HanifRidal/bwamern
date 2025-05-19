@@ -74,5 +74,6 @@ const PemesanList = () => {
     </div>
   );
 };
+};
 
 export default PemesanList;
