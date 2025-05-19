@@ -58,7 +58,7 @@ const PemesanList = () => {
                   <Button
                     type="link"
                     className="stretched-link d-block text-gray-800"
-                    href={`/properties/${item.id_paket}`}
+                    href={`/properties/${item.Kota}`}
                   >
                     <h5 className="h4">{item.NamaTempat}</h5>
                   </Button>
