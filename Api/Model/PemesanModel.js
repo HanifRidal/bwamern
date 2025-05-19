@@ -1,13 +1,7 @@
 const { executeQuery } = require("../db");
 
-async function getAll() {
-  const query = "SELECT * FROM TujuanWisata";
-  const result = await executeQuery(query, [], [], false);
-  return result.recordset;
-}
-
-async function getAllWisata() {
-  const query = "SELECT * FROM TujuanWisata";
+async function getAllPemesan() {
+  const query = "SELECT * FROM Pemesan";
   const result = await executeQuery(query, [], [], false);
   return result.recordset;
 }
@@ -20,7 +14,6 @@ async function create(id, name) {
 }
 
 module.exports = {
-  getAll,
+  getAllPemesan,
   create,
-  getAllWisata,
 };

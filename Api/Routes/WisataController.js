@@ -1,11 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const pemesanService = require("../Services/PemesanServices");
+const WisataServices = require("../Services/WisataServices");
 
-// Get all pemesan
-router.get("/Pemesan", async (req, res) => {
+router.get("/Wisata", async (req, res) => {
   try {
-    const data = await pemesanService.getAllPemesan();
+    const data = await WisataServices.getAllWisata();
     res.status(200).json({
       status: 200,
       message: "Data retrieved successfully",
@@ -20,20 +19,18 @@ router.get("/Pemesan", async (req, res) => {
   }
 });
 
-
-// Add a new pemesan
-router.post("/", async (req, res) => {
+router.get("/TypeWisata", async (req, res) => {
   try {
-    const { id, name } = req.body;
-    await pemesanService.createPemesan(id, name);
-    res.status(201).json({
-      status: 201,
-      message: "Pemesan created successfully",
+    const data = await WisataServices.getTypeWisata();
+    res.status(200).json({
+      status: 200,
+      message: "Data retrieved successfully",
+      data,
     });
   } catch (error) {
     res.status(500).json({
       status: 500,
-      message: "Failed to create pemesan",
+      message: "Failed to retrieve data",
       error: error.message,
     });
   }
