@@ -14,6 +14,7 @@ async function getAllWisata() {
   return result.recordset;
 }
 
+
 async function getTypeWisata() {
   const query = "SELECT DISTINCT type FROM TujuanWisata";
   const result = await executeQuery(query, [], [], false);
