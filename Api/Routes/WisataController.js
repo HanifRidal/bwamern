@@ -21,9 +21,12 @@ router.get("/Wisata", async (req, res) => {
 
 router.get("/Wisata/Type", async (req, res) => {
   try {
-    const types = ["Beach", "Historical"];
+    const types = ["Beach", "Historical", "Nature"];
     const limitPerType = 3;
-    const data = await WisataServices.getLimitedWisataByTypes(types, limitPerType);
+    const data = await WisataServices.getLimitedWisataByTypes(
+      types,
+      limitPerType
+    );
     console.log("Sending data:", data); // <-- Add this
     res.json({ status: 200, data });
   } catch (error) {

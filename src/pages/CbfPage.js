@@ -6,10 +6,10 @@ import ItemDetails from "json/itemDetails.json";
 import CbfForm from "parts/CbfForm";
 
 export default class Cbf extends Component {
-  componentDidMount() {
-    window.title = "CBF Page";
-    window.scrollTo(0, 0);
-  }
+  // componentDidMount() {
+  //   window.title = "CBF Page";
+  //   window.scrollTo(0, 0);
+  // }
 
   render() {
     return (
