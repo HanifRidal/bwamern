@@ -106,18 +106,20 @@ export default function UserManage() {
                 <td>{user.name}</td>
                 <td>{user.email}</td>
                 <td>
-                  <button
-                    className="btn btn-sm btn-warning me-2"
-                    onClick={() => handleEdit(user)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="btn btn-sm btn-danger"
-                    onClick={() => handleDelete(user.id)}
-                  >
-                    Delete
-                  </button>
+                  <div class="btn-group" role="group">
+                    <button
+                      className="btn btn-warning btn-sm"
+                      onClick={() => handleEdit(user)}
+                    >
+                      edit
+                    </button>
+                    <button
+                      className="btn btn-outline-danger btn-sm"
+                      onClick={() => handleDelete(user.id)}
+                    >
+                      delete
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))
