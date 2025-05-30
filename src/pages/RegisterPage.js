@@ -1,32 +1,36 @@
-import Button from "elements/Button";
 import React, { useState } from "react";
-// import { withRouter } from "react-router-dom";
+import Button from "elements/Button";
 
-export default function LoginPage(props) {
+export default function RegisterPage(props) {
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
-  const handleLoginAdmin = () => {
-    window.location.href = "/admin";
-  };
+  const [success, setSuccess] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (username === "" || password === "") {
-      setError("Username and password are required.");
+    setError("");
+    setSuccess("");
+    if (!username || !email || !password || !confirm) {
+      setError("All fields are required.");
       return;
     }
-    if (username === "admin" && password === "admin") {
-      setError("");
-      handleLoginAdmin();
-    } else {
-      setError("Invalid username or password.");
+    if (password !== confirm) {
+      setError("Passwords do not match.");
+      return;
     }
+    // TODO: Add registration logic (API call)
+    setSuccess("Registration successful! You can now login.");
+    setUsername("");
+    setEmail("");
+    setPassword("");
+    setConfirm("");
   };
 
   return (
     <div
-      className=""
       style={{
         minHeight: "100vh",
         display: "flex",
@@ -46,7 +50,8 @@ export default function LoginPage(props) {
           background: "#fff",
         }}
       >
-        <h2 className="mb-4 text-center">SiliwangiTravel</h2>
+        <h2 className="mb-4 text-center">Sign Up</h2>
+        <h4 className="mb-4 text-center">Create your account here !</h4>
         <form onSubmit={handleSubmit}>
           <div className="form-group mb-3">
             <label>Username</label>
@@ -59,6 +64,15 @@ export default function LoginPage(props) {
             />
           </div>
           <div className="form-group mb-3">
+            <label>Email</label>
+            <input
+              type="email"
+              className="form-control"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div className="form-group mb-3">
             <label>Password</label>
             <input
               type="password"
@@ -67,16 +81,25 @@ export default function LoginPage(props) {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
+          <div className="form-group mb-3">
+            <label>Confirm Password</label>
+            <input
+              type="password"
+              className="form-control"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+            />
+          </div>
           {error && <div className="alert alert-danger mb-3">{error}</div>}
-          <div className="mb-3 text-center text-gray-500">
-            Doesn't have account?
-            <Button className="" type="link" href="/register">
-              SignUp Here
+          {success && <div className="alert alert-success mb-3">{success}</div>}
+          <div className="mb-3 text-gray-500 text-center">
+            <Button className="" type="link" href="/login">
+              Have account?
             </Button>
           </div>
           <div className="d-flex justify-content-center">
             <Button className="btn px-5" hasShadow isPrimary>
-              Login
+              Register
             </Button>
           </div>
         </form>
