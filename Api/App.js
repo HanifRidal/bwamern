@@ -5,14 +5,18 @@ const { connect } = require("./db.js");
 const pemesanRoutes = require("./Routes/PemesanController.js");
 const wisataRoutes = require("./Routes/WisataController.js");
 const cbfRoutes = require("./Routes/CbfController.js");
+const userRoutes = require("./Routes/UserController.js");
+const cookieParser = require('cookie-parser');
 
 const app = express();
-const port = 3000;
+const port = 3001;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-app.use(cors());
-
+app.use(cookieParser());
+app.use(cors({
+  origin: 'http://localhost:3000', // Your frontend URL
+  credentials: true // Allow cookies to be sent
+}));
 connect()
   .then((connection) => {
     console.log("Connected to the database.");
@@ -26,7 +30,8 @@ app.use("/Api", cbfRoutes);
 
 app.use("/pemesan", pemesanRoutes)
 
-app.use("/Api", wisataRoutes)
+app.use("/Api/wisata", wisataRoutes)
+app.use("/Api/user", userRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
