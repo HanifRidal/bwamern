@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import UserManagement from "../parts/UserManage";
+import VacationManagement from "../parts/VacationManage";
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("user");
@@ -39,7 +40,7 @@ export default function AdminPage() {
         {activeTab === "vacation" && (
           <>
             <h4>Vacation Management</h4>
-            {/* <VacationManagement /> */}
+            <VacationManagement />
           </>
         )}
       </div>
