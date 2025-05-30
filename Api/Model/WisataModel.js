@@ -10,6 +10,12 @@ async function getAll() {
   return result.recordset;
 }
 
+async function getTypeWisata() {
+  const query = "SELECT DISTINCT type FROM TujuanWisata";
+  const result = await executeQuery(query, [], [], false);
+  return result.recordset;
+}
+
 async function getById(id) {
   const query = `
     SELECT t.*, i.Id_Image, i.Url_1, i.Url_2 
@@ -185,4 +191,5 @@ module.exports = {
   create,
   update,
   remove,
+  getTypeWisata
 };

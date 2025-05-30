@@ -20,7 +20,7 @@ export default class CbfForm extends Component {
 
   componentDidMount() {
     axios
-      .get("http://localhost:3000/Api/TypeWisata")
+      .get("http://localhost:3001/Api/wisata/TypeWisata")
       .then((res) => {
         if (res.data && Array.isArray(res.data.data)) {
           this.setState({
@@ -58,7 +58,7 @@ export default class CbfForm extends Component {
     e.preventDefault();
     this.setState({ loading: true, error: null });
     axios
-      .post("http://localhost:3000/Api/recommendations", {
+      .post("http://localhost:3001/Api/recommendations", {
         type: this.state.types,
       })
       .then((res) => {

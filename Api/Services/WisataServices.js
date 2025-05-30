@@ -8,6 +8,20 @@ async function getDestinationById(id) {
   return await tujuanWisataModel.getById(id);
 }
 
+async function getTypeWisata() {
+  return await tujuanWisataModel.getTypeWisata();
+}
+
+async function getLimitedWisataByTypes(types, limitPerType) {
+  const allWisata = await tujuanWisataModel.getAll();
+  let result = [];
+  types.forEach(type => {
+    const filtered = allWisata.filter(item => item.type === type).slice(0, limitPerType);
+    result = result.concat(filtered);
+  });
+  return result;
+}
+
 async function createDestination(destinationData, imageData) {
   // Validate required fields
   if (!destinationData.id || !destinationData.nama || !destinationData.kota || !destinationData.type) {
@@ -78,4 +92,6 @@ module.exports = {
   createDestination,
   updateDestination,
   deleteDestination,
+  getLimitedWisataByTypes,
+  getTypeWisata
 };
