@@ -6,6 +6,8 @@ import LandingPage from "pages/LandingPage";
 // import Example from "pages/Example";
 import DetailsPage from "pages/DetailsPage";
 import Cbf from "pages/CbfPage";
+import AdminPage from "pages/AdminPage";
+import LoginPage from "pages/LoginPage";
 
 const history = createBrowserHistory({
   basename: process.env.PUBLIC_URL,
@@ -19,6 +21,8 @@ function App() {
           <Route exact path="/" component={LandingPage} />
           <Route path="/browse-by" component={Cbf} />
           <Route exact path="/properties/:id" component={DetailsPage} />
+          <Route exact path="/login" component={LoginPage} />
+          <Route exact path="/admin" component={AdminPage} />
         </Switch>
       </Router>
     </div>
