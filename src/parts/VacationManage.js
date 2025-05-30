@@ -298,18 +298,20 @@ export default function VacationManage() {
                   )}
                 </td>
                 <td>
-                  <button
-                    className="btn btn-sm btn-warning me-2"
-                    onClick={() => handleEdit(vac)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="btn btn-sm btn-danger"
-                    onClick={() => handleDelete(vac.id)}
-                  >
-                    Delete
-                  </button>
+                  <div class="btn-group" role="group">
+                    <button
+                      className="btn btn-warning btn-sm"
+                      onClick={() => handleEdit(vac)}
+                    >
+                      edit
+                    </button>
+                    <button
+                      className="btn btn-outline-danger btn-sm"
+                      onClick={() => handleDelete(vac.id)}
+                    >
+                      delete
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))
