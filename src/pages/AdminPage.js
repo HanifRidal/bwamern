@@ -4,9 +4,19 @@ import VacationManagement from "../parts/VacationManage";
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("user");
+  const handleLogout = () => {
+    window.location.href = "/login";
+  };
 
   return (
-    <div style={{ padding: 40 }}>
+    <div className="container-fluid">
+      <div className="d-flex justify-content-end" style={{ padding: 40 }}>
+        <div style={{ position: "relative" }}>
+          <button className="btn btn-light border" onClick={handleLogout}>
+            Logout
+          </button>
+        </div>
+      </div>
       <h2>Admin Dashboard</h2>
       <div className="mb-4">
         <ul className="nav nav-tabs">
