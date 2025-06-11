@@ -55,7 +55,6 @@ router.get("/Type", async (req, res) => {
     const types = ["Beach", "Historical"];
     const limitPerType = 3;
     const data = await tujuanWisataService.getLimitedWisataByTypes(types, limitPerType);
-    console.log("Sending data:", data); // <-- Add this
     res.json({ status: 200, data });
   } catch (error) {
     console.error(error); // <-- Add this
