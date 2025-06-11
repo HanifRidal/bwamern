@@ -22,7 +22,11 @@ export default function LoginPage(props) {
       
       // Extract user data and role from response
       const userData = response.data.data;
-      const userRole = userData.role;
+      const userRole = userData.role_user;
+      const token = response.data.token; 
+      // Store token in localStorage
+    localStorage.setItem("token", token);
+    console.log("Token stored:", token);
       
       // Update auth context with user info
       setAuth({
@@ -31,7 +35,7 @@ export default function LoginPage(props) {
           id: userData.id,
           username: userData.username,
           email: userData.email,
-          role: userRole
+          role_user: userRole
         }
       });
       

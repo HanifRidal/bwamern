@@ -10,13 +10,11 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="container-fluid">
-      <div className="d-flex justify-content-end" style={{ padding: 40 }}>
-        <div style={{ position: "relative" }}>
-          <Logout />
-        </div>
+    <div className="container-fluid mt-4">
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2 className="mb-4">Admin Dashboard</h2>
+        <Logout onLogout={handleLogout} />
       </div>
-      <h2>Admin Dashboard</h2>
       <div className="mb-4">
         <ul className="nav nav-tabs">
           <li className="nav-item">
@@ -39,6 +37,7 @@ export default function AdminPage() {
           </li>
         </ul>
       </div>
+      
       <div className="card p-4">
         {activeTab === "user" && (
           <>

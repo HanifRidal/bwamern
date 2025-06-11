@@ -27,8 +27,9 @@ const authenticateToken = async (req, res, next) => {
 
 const requireRole = (roles) => {
   return (req, res, next) => {
-    // authenticateToken middleware should run before this middleware
-    // to populate req.user
+    console.log("User object in requireRole middleware:", req.user);
+    console.log("Required roles:", roles);
+    console.log("User role:", req.user.role); // This is correct now
     
     if (!req.user) {
       return res.status(401).json({
@@ -37,8 +38,8 @@ const requireRole = (roles) => {
       });
     }
     
-    // Check if user's role is in the allowed roles array
-    if (roles.includes(req.user.role_user)) {
+    // Change this line to check req.user.role instead of req.user.role_user
+    if (roles.includes(req.user.role)) {
       return next();
     }
     
