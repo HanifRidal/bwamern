@@ -22,7 +22,7 @@ export default function LoginPage(props) {
       
       // Extract user data and role from response
       const userData = response.data.data;
-      const userRole = userData.role_user;
+      const userRole = userData.role;
       const token = response.data.token; 
       // Store token in localStorage
     localStorage.setItem("token", token);
@@ -35,7 +35,7 @@ export default function LoginPage(props) {
           id: userData.id,
           username: userData.username,
           email: userData.email,
-          role_user: userRole
+          role: userRole
         }
       });
       
