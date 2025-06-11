@@ -3,13 +3,19 @@ const router = express.Router();
 const tujuanWisataService = require("../Services/WisataServices");
 const { authenticateToken, requireRole } = require("../Middleware/AuthUser");
 const multer = require("multer");
+
 const path = require("path");
 const fs = require("fs");
+
+const uploadDir = path.join(__dirname, '../../public/images');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
 
 // Set up multer for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "public/images/");
+    cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
@@ -24,6 +30,11 @@ const upload = multer({
     const allowedTypes = /jpeg|jpg|png|gif/;
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
     const mimetype = allowedTypes.test(file.mimetype);
+
+    console.log("Filename:", file.originalname);
+    console.log("MIME Type:", file.mimetype);
+    console.log("Extension match:", extname);
+    console.log("MIME Type match:", mimetype);
     
     if (extname && mimetype) {
       return cb(null, true);
@@ -110,7 +121,18 @@ router.get("/:id", authenticateToken, async (req, res) => {
 // Create a new destination
 router.post("/", authenticateToken, requireRole(["admin"]), upload.array("images", 3), async (req, res) => {
   try {
-    const { id, nama, kota, keterangan, type, popularity } = req.body;
+    const { nama, kota, keterangan, type, popularity } = req.body;
+    
+    console.log("Files received:", req.files);
+    console.log("Body received:", req.body);
+    
+    // Validate required fields
+    if (!nama || !kota || !type) {
+      return res.status(400).json({
+        status: 400,
+        message: "Required fields missing: nama, kota, and type are required"
+      });
+    }
     
     // Ensure we have at least one image
     if (!req.files || req.files.length < 1) {
@@ -137,13 +159,12 @@ router.post("/", authenticateToken, requireRole(["admin"]), upload.array("images
     // Create a unique ImageID for the ImageUrls table
     const imageId = Date.now();
     
-    // Prepare data for service
+    // Prepare data for service - Remove id as it should be auto-generated
     const destinationData = {
-      id,
-      nama,
-      kota,
-      keterangan,
-      type,
+      nama: nama.trim(),
+      kota: kota.trim(),
+      keterangan: keterangan || "",
+      type: type.trim(),
       imgUrl: mainImageUrl,
       popularity: parseInt(popularity) || 0,
     };
@@ -154,6 +175,7 @@ router.post("/", authenticateToken, requireRole(["admin"]), upload.array("images
       url2
     };
     
+    // Call the service function with proper data
     await tujuanWisataService.createDestination(destinationData, imageData);
     
     res.status(201).json({
@@ -161,6 +183,7 @@ router.post("/", authenticateToken, requireRole(["admin"]), upload.array("images
       message: "Destination created successfully",
     });
   } catch (error) {
+     console.error("Error in POST /wisata:", error);
     // If there's an error, delete any uploaded files
     if (req.files && req.files.length > 0) {
       req.files.forEach(file => {

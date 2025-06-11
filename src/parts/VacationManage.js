@@ -1,25 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import api from "../Config/axiosconfig";
+import AuthContext from '../context/AuthContext';
 
 const typeOptions = ["Beach", "Historical", "Nature", "Mountain"];
 
 export default function VacationManage() {
-  const [vacations, setVacations] = useState([
-    {
-      id: 1,
-      NamaTempat: "Pantai Kuta",
-      Kota: "Bali",
-      Keterangan: "Pantai terkenal di Bali.",
-      type: "Beach",
-      Img1: "",
-      Img2: "",
-      Img3: "",
-    },
-  ]);
+  const { auth } = useContext(AuthContext);
+  const [vacations, setVacations] = useState([]);
   const [form, setForm] = useState({
     NamaTempat: "",
     Kota: "",
     Keterangan: "",
     type: "",
+    popularity: 0,
     Img1: "",
     Img2: "",
     Img3: "",
@@ -28,9 +21,32 @@ export default function VacationManage() {
     Img3File: null,
   });
   const [editingId, setEditingId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+
+  // Fetch all vacations on component mount
+  useEffect(() => {
+    fetchVacations();
+  }, []);
+
+  const fetchVacations = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get("/wisata");
+      setVacations(response.data.data || []);
+      setError(null);
+    } catch (err) {
+      console.error("Error fetching vacations:", err);
+      setError("Failed to load vacation data");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
   };
 
   const handleImageChange = (e) => {
@@ -38,92 +54,194 @@ export default function VacationManage() {
     if (files && files[0]) {
       setForm({
         ...form,
-        [name]: URL.createObjectURL(files[0]),
         [name + "File"]: files[0],
+        [name]: URL.createObjectURL(files[0]),
       });
     }
   };
 
-  const handleAdd = (e) => {
+  const prepareFormData = () => {
+    const formData = new FormData();
+    // Make sure the field names match what the API expects
+  formData.append("nama", form.NamaTempat); // Changed NamaTempat -> nama
+  formData.append("kota", form.Kota); // Changed Kota -> kota
+  formData.append("keterangan", form.Keterangan); // Changed Keterangan -> keterangan
+  formData.append("type", form.type);
+  formData.append("popularity", form.popularity || 0);
+  
+  // Add image files
+  if (form.Img1File) formData.append("images", form.Img1File);
+  if (form.Img2File) formData.append("images", form.Img2File);
+  if (form.Img3File) formData.append("images", form.Img3File);
+  
+    return formData;
+  };
+
+  const handleAdd = async (e) => {
     e.preventDefault();
-    if (!form.NamaTempat || !form.Kota || !form.Keterangan || !form.type)
+    
+    // Basic validation
+    if (!form.NamaTempat || !form.Kota || !form.type || !form.Img1File) {
+      setError("Required fields: Name, City, Type and at least one image");
       return;
-    setVacations([
-      ...vacations,
-      {
-        id: Date.now(),
-        NamaTempat: form.NamaTempat,
-        Kota: form.Kota,
-        Keterangan: form.Keterangan,
-        type: form.type,
-        Img1: form.Img1,
-        Img2: form.Img2,
-        Img3: form.Img3,
-      },
-    ]);
-    setForm({
-      NamaTempat: "",
-      Kota: "",
-      Keterangan: "",
-      type: "",
-      Img1: "",
-      Img2: "",
-      Img3: "",
-      Img1File: null,
-      Img2File: null,
-      Img3File: null,
-    });
+    }
+
+    try {
+      setLoading(true);
+      const formData = prepareFormData();
+
+      console.log("FormData contents:");
+      for (let pair of formData.entries()) {
+        console.log(pair[0], pair[1] instanceof File ? pair[1].name : pair[1]);
+      }
+
+      const response = await api.post("/wisata", formData);
+      console.log("API Response:", response.data);
+      
+      setSuccess("Vacation destination added successfully!");
+      fetchVacations(); // Refresh the list
+      
+      // Reset form
+      setForm({
+        NamaTempat: "",
+        Kota: "",
+        Keterangan: "",
+        type: "",
+        popularity: 0,
+        Img1: "",
+        Img2: "",
+        Img3: "",
+        Img1File: null,
+        Img2File: null,
+        Img3File: null,
+      });
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (err) {
+      console.error("Error adding vacation:", err);
+      setError("Failed to add vacation. " + (err.response?.data?.message || ""));
+      if (err.response && err.response.data) {
+        console.error("Server response:", err.response.data);
+      }
+          setError("Failed to add vacation. " + (err.response?.data?.message || ""));
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleEdit = (vac) => {
-    setEditingId(vac.id);
+    setEditingId(vac.TujuanID || vac.id);
     setForm({
-      ...vac,
+      NamaTempat: vac.NamaTempat,
+      Kota: vac.Kota,
+      Keterangan: vac.Keterangan || "",
+      type: vac.type,
+      popularity: vac.Popularity || 0,
+      Img1: vac.ImgUrl || "",
+      Img2: vac.Url_1 || "",
+      Img3: vac.Url_2 || "",
       Img1File: null,
       Img2File: null,
       Img3File: null,
+      imageId: vac.ImageID || null,
     });
   };
 
-  const handleUpdate = (e) => {
+  const handleUpdate = async (e) => {
     e.preventDefault();
-    setVacations(
-      vacations.map((vac) =>
-        vac.id === editingId
-          ? {
-              ...vac,
-              NamaTempat: form.NamaTempat,
-              Kota: form.Kota,
-              Keterangan: form.Keterangan,
-              type: form.type,
-              Img1: form.Img1,
-              Img2: form.Img2,
-              Img3: form.Img3,
-            }
-          : vac
-      )
-    );
-    setEditingId(null);
-    setForm({
-      NamaTempat: "",
-      Kota: "",
-      Keterangan: "",
-      type: "",
-      Img1: "",
-      Img2: "",
-      Img3: "",
-      Img1File: null,
-      Img2File: null,
-      Img3File: null,
-    });
+    
+    if (!form.NamaTempat || !form.Kota || !form.type) {
+      setError("Name, City and Type are required fields");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const formData = prepareFormData();
+      
+      // Add image ID if available
+      if (form.imageId) {
+        formData.append("imageId", form.imageId);
+      }
+      
+      await api.put(`/wisata/${editingId}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      
+      setSuccess("Vacation destination updated successfully!");
+      fetchVacations(); // Refresh the list
+      
+      // Reset form and editing state
+      setEditingId(null);
+      setForm({
+        NamaTempat: "",
+        Kota: "",
+        Keterangan: "",
+        type: "",
+        popularity: 0,
+        Img1: "",
+        Img2: "",
+        Img3: "",
+        Img1File: null,
+        Img2File: null,
+        Img3File: null,
+      });
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (err) {
+      console.error("Error updating vacation:", err);
+      setError("Failed to update vacation. " + (err.response?.data?.message || ""));
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleDelete = (id) => {
-    setVacations(vacations.filter((vac) => vac.id !== id));
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this vacation destination?")) {
+      try {
+        setLoading(true);
+        await api.delete(`/wisata/${id}`);
+        
+        setSuccess("Vacation destination deleted successfully!");
+        setVacations(vacations.filter(vac => (vac.TujuanID || vac.id) !== id));
+        
+        // Clear success message after 3 seconds
+        setTimeout(() => setSuccess(null), 3000);
+      } catch (err) {
+        console.error("Error deleting vacation:", err);
+        setError("Failed to delete vacation.");
+      } finally {
+        setLoading(false);
+      }
+    }
   };
+
+  if (loading && vacations.length === 0) {
+    return <div className="text-center my-5">Loading vacation data...</div>;
+  }
 
   return (
-    <div>
+    <div className="container mt-4">
+      <h2>Vacation Management</h2>
+      
+      {error && (
+        <div className="alert alert-danger alert-dismissible fade show" role="alert">
+          {error}
+          <button type="button" className="btn-close" onClick={() => setError(null)}></button>
+        </div>
+      )}
+      
+      {success && (
+        <div className="alert alert-success alert-dismissible fade show" role="alert">
+          {success}
+          <button type="button" className="btn-close" onClick={() => setSuccess(null)}></button>
+        </div>
+      )}
+      
       <form onSubmit={editingId ? handleUpdate : handleAdd} className="mb-4">
         <div className="row g-2">
           <div className="col">
@@ -134,6 +252,7 @@ export default function VacationManage() {
               placeholder="Nama Tempat"
               value={form.NamaTempat}
               onChange={handleChange}
+              required
             />
           </div>
           <div className="col">
@@ -144,6 +263,7 @@ export default function VacationManage() {
               placeholder="Kota"
               value={form.Kota}
               onChange={handleChange}
+              required
             />
           </div>
           <div className="col">
@@ -152,6 +272,7 @@ export default function VacationManage() {
               className="form-control"
               value={form.type}
               onChange={handleChange}
+              required
             >
               <option value="">Pilih Type</option>
               {typeOptions.map((opt) => (
@@ -160,6 +281,18 @@ export default function VacationManage() {
                 </option>
               ))}
             </select>
+          </div>
+          <div className="col">
+            <input
+              type="number"
+              name="popularity"
+              className="form-control"
+              placeholder="Popularity (0-5)"
+              value={form.popularity}
+              onChange={handleChange}
+              min="0"
+              max="5"
+            />
           </div>
         </div>
         <div className="row g-2 mt-2">
@@ -176,6 +309,7 @@ export default function VacationManage() {
         </div>
         <div className="row g-2 mt-2">
           <div className="col">
+            <label className="form-label">Image 1 (Primary)</label>
             <input
               type="file"
               name="Img1"
@@ -185,13 +319,14 @@ export default function VacationManage() {
             />
             {form.Img1 && (
               <img
-                src={form.Img1}
+                src={form.Img1.startsWith('blob:') ? form.Img1 : `http://localhost:3001${form.Img1}`}
                 alt="Preview 1"
-                style={{ width: 40, marginTop: 4 }}
+                style={{ height: 60, marginTop: 4 }}
               />
             )}
           </div>
           <div className="col">
+            <label className="form-label">Image 2</label>
             <input
               type="file"
               name="Img2"
@@ -201,13 +336,14 @@ export default function VacationManage() {
             />
             {form.Img2 && (
               <img
-                src={form.Img2}
+                src={form.Img2.startsWith('blob:') ? form.Img2 : `http://localhost:3001${form.Img2}`}
                 alt="Preview 2"
-                style={{ width: 40, marginTop: 4 }}
+                style={{ height: 60, marginTop: 4 }}
               />
             )}
           </div>
           <div className="col">
+            <label className="form-label">Image 3</label>
             <input
               type="file"
               name="Img3"
@@ -217,15 +353,29 @@ export default function VacationManage() {
             />
             {form.Img3 && (
               <img
-                src={form.Img3}
+                src={form.Img3.startsWith('blob:') ? form.Img3 : `http://localhost:3001${form.Img3}`}
                 alt="Preview 3"
-                style={{ width: 40, marginTop: 4 }}
+                style={{ height: 60, marginTop: 4 }}
               />
             )}
           </div>
-          <div className="col-auto">
-            <button type="submit" className="btn btn-primary">
-              {editingId ? "Update" : "Add"}
+        </div>
+        <div className="row mt-3">
+          <div className="col">
+            <button 
+              type="submit" 
+              className="btn btn-primary"
+              disabled={loading}
+            >
+              {loading ? (
+                <span>
+                  <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                  {' '}
+                  {editingId ? "Updating..." : "Adding..."}
+                </span>
+              ) : (
+                editingId ? "Update" : "Add"
+              )}
             </button>
             {editingId && (
               <button
@@ -238,6 +388,7 @@ export default function VacationManage() {
                     Kota: "",
                     Keterangan: "",
                     type: "",
+                    popularity: 0,
                     Img1: "",
                     Img2: "",
                     Img3: "",
@@ -253,71 +404,88 @@ export default function VacationManage() {
           </div>
         </div>
       </form>
-      <table className="table table-bordered">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Nama Tempat</th>
-            <th>Kota</th>
-            <th>Keterangan</th>
-            <th>Type</th>
-            <th>Img 1</th>
-            <th>Img 2</th>
-            <th>Img 3</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {vacations.length === 0 ? (
+      
+      <div className="table-responsive">
+        <table className="table table-bordered table-hover">
+          <thead className="table-light">
             <tr>
-              <td colSpan={9} className="text-center">
-                No vacation data.
-              </td>
+              <th style={{ width: "40px" }}>#</th>
+              <th>Nama Tempat</th>
+              <th>Kota</th>
+              <th style={{ width: "100px" }}>Type</th>
+              <th style={{ width: "100px" }}>Pop.</th>
+              <th style={{ width: "80px" }}>Img 1</th>
+              <th style={{ width: "80px" }}>Img 2</th>
+              <th style={{ width: "80px" }}>Img 3</th>
+              <th style={{ width: "120px" }}>Actions</th>
             </tr>
-          ) : (
-            vacations.map((vac, idx) => (
-              <tr key={vac.id}>
-                <td>{idx + 1}</td>
-                <td>{vac.NamaTempat}</td>
-                <td>{vac.Kota}</td>
-                <td>{vac.Keterangan}</td>
-                <td>{vac.type}</td>
-                <td>
-                  {vac.Img1 && (
-                    <img src={vac.Img1} alt="" style={{ width: 40 }} />
-                  )}
-                </td>
-                <td>
-                  {vac.Img2 && (
-                    <img src={vac.Img2} alt="" style={{ width: 40 }} />
-                  )}
-                </td>
-                <td>
-                  {vac.Img3 && (
-                    <img src={vac.Img3} alt="" style={{ width: 40 }} />
-                  )}
-                </td>
-                <td>
-                  <div class="btn-group" role="group">
-                    <button
-                      className="btn btn-warning btn-sm"
-                      onClick={() => handleEdit(vac)}
-                    >
-                      edit
-                    </button>
-                    <button
-                      className="btn btn-outline-danger btn-sm"
-                      onClick={() => handleDelete(vac.id)}
-                    >
-                      delete
-                    </button>
-                  </div>
+          </thead>
+          <tbody>
+            {vacations.length === 0 ? (
+              <tr>
+                <td colSpan={9} className="text-center">
+                  No vacation data available.
                 </td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ) : (
+              vacations.map((vac, idx) => (
+                <tr key={vac.TujuanID || vac.id}>
+                  <td>{idx + 1}</td>
+                  <td>{vac.NamaTempat}</td>
+                  <td>{vac.Kota}</td>
+                  <td>{vac.type}</td>
+                  <td>{vac.Popularity || 0}/5</td>
+                  <td>
+                    {vac.ImgUrl && (
+                      <img 
+                        src={`${vac.ImgUrl}`} 
+                        alt="" 
+                        style={{ width: 60, height: 40, objectFit: 'cover' }} 
+                      />
+                    )}
+                  </td>
+                  <td>
+                    {vac.Url_1 && (
+                      <img 
+                        src={`${vac.Url_1}`} 
+                        alt="" 
+                        style={{ width: 60, height: 40, objectFit: 'cover' }} 
+                      />
+                    )}
+                  </td>
+                  <td>
+                    {vac.Url_2 && (
+                      <img 
+                        src={`${vac.Url_2}`} 
+                        alt="" 
+                        style={{ width: 60, height: 40, objectFit: 'cover' }} 
+                      />
+                    )}
+                  </td>
+                  <td>
+                    <div className="btn-group" role="group">
+                      <button
+                        className="btn btn-warning btn-sm"
+                        onClick={() => handleEdit(vac)}
+                        disabled={loading}
+                      >
+                        <i className="bi bi-pencil"></i> Edit
+                      </button>
+                      <button
+                        className="btn btn-outline-danger btn-sm"
+                        onClick={() => handleDelete(vac.TujuanID || vac.id)}
+                        disabled={loading}
+                      >
+                        <i className="bi bi-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

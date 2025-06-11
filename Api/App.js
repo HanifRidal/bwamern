@@ -7,6 +7,7 @@ const wisataRoutes = require("./Routes/WisataController.js");
 const cbfRoutes = require("./Routes/CbfController.js");
 const userRoutes = require("./Routes/UserController.js");
 const cookieParser = require('cookie-parser');
+const path = require('path');
 
 const app = express();
 const port = 3001;
@@ -32,6 +33,8 @@ app.use("/pemesan", pemesanRoutes)
 
 app.use("/Api/wisata", wisataRoutes)
 app.use("/Api/user", userRoutes);
+
+app.use('/images', express.static(path.join(__dirname, '../public/images')));
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
