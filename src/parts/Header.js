@@ -7,6 +7,8 @@ import api from "../Config/axiosconfig";
 
 export default function Header(props) {
   const { auth, setAuth } = useContext(AuthContext);
+  console.log("Auth state:", auth); // Check auth state
+console.log("Is logged in:", auth.isLoggedIn); // Verify isLoggedIn flag
   const history = useHistory();
 
   const getNavLinkClass = (path) => {
@@ -15,7 +17,8 @@ export default function Header(props) {
 
   const handleLogout = async () => {
     try {
-      // Call your logout API endpoint if you have one
+      console.log("Logout clicked"); 
+
       await api.post("/user/logout");
       
       // Clear authentication state
@@ -30,7 +33,14 @@ export default function Header(props) {
       // Redirect to homepage
       history.push("/");
     } catch (error) {
-      console.error("Logout failed", error);
+       console.error("Logout failed", error);
+    // Still clear local state even if API call fails
+    setAuth({
+      isLoggedIn: false,
+      user: null
+    });
+    localStorage.removeItem("token");
+    history.push("/");
     }
   };
 
@@ -64,7 +74,6 @@ export default function Header(props) {
                     style={{ buttonRadius: 20 }}
                     hasShadow
                     isDanger
-                    type="button"
                     onClick={handleLogout}
                   >
                     Logout

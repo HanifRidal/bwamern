@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import Button from "elements/Button";
+import axios from "axios"; // Make sure axios is imported
+import { useHistory } from "react-router-dom";
 
 export default function RegisterPage(props) {
   const [username, setUsername] = useState("");
@@ -8,25 +10,67 @@ export default function RegisterPage(props) {
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const history = useHistory();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
+    setIsLoading(true);
+    
+    // Form validation
     if (!username || !email || !password || !confirm) {
       setError("All fields are required.");
+      setIsLoading(false);
       return;
     }
+    
     if (password !== confirm) {
       setError("Passwords do not match.");
+      setIsLoading(false);
       return;
     }
-    // TODO: Add registration logic (API call)
-    setSuccess("Registration successful! You can now login.");
-    setUsername("");
-    setEmail("");
-    setPassword("");
-    setConfirm("");
+    
+    try {
+      // Make API call to register endpoint
+      const response = await axios.post('http://localhost:3001/api/user/register', {
+        username,
+        email,
+        password
+      });
+      
+      // Handle successful registration
+      setSuccess("Registration successful! You can now login.");
+      setUsername("");
+      setEmail("");
+      setPassword("");
+      setConfirm("");
+      
+      // Optionally redirect to login page after a delay
+      setTimeout(() => {
+        history.push('/login');
+      }, 2000);
+      
+    } catch (error) {
+      // Handle registration errors
+      if (error.response) {
+        // The request was made and the server responded with an error status code
+        if (error.response.status === 409) {
+          setError("Username already exists. Please choose another.");
+        } else {
+          setError(error.response.data.message || "Registration failed. Please try again.");
+        }
+      } else if (error.request) {
+        // The request was made but no response was received
+        setError("No response from server. Please try again later.");
+      } else {
+        // Something happened in setting up the request
+        setError("An error occurred. Please try again.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
