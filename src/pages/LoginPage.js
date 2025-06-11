@@ -1,26 +1,50 @@
+import React, { useState, useContext } from 'react';
+import axios from 'axios';
 import Button from "elements/Button";
-import React, { useState } from "react";
-// import { withRouter } from "react-router-dom";
+import AuthContext from '../context/AuthContext';
+import { useHistory } from "react-router-dom";
 
 export default function LoginPage(props) {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const handleLoginAdmin = () => {
-    window.location.href = "/admin";
-  };
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const { setAuth } = useContext(AuthContext);
+  const history = useHistory(); // Initialize useHistory hook
+  
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (username === "" || password === "") {
-      setError("Username and password are required.");
-      return;
-    }
-    if (username === "admin" && password === "admin") {
-      setError("");
-      handleLoginAdmin();
-    } else {
-      setError("Invalid username or password.");
+    try {
+      const response = await axios.post('http://localhost:3001/api/user/login', 
+        { username, password },
+        { withCredentials: true }
+      );
+      
+      // Extract user data and role from response
+      const userData = response.data.data;
+      const userRole = userData.role;
+      
+      // Update auth context with user info
+      setAuth({
+        isLoggedIn: true,
+        user: {
+          id: userData.id,
+          username: userData.username,
+          email: userData.email,
+          role: userRole
+        }
+      });
+      
+      // Redirect based on user role
+      if (userRole === 'admin') {
+        window.location.href = '/admin'; // Redirect to admin page
+      } else {
+        // Default to dashboard for regular users (konsumen)
+        window.location.href = '/'; // Redirect to user dashboard
+      }
+      
+    } catch (err) {
+      setError(err.response?.data?.message || 'Login failed');
     }
   };
 

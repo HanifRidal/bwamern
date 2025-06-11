@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import UserManagement from "../parts/UserManage";
 import VacationManagement from "../parts/VacationManage";
+import Logout from "component/Logout";
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("user");
@@ -12,9 +13,7 @@ export default function AdminPage() {
     <div className="container-fluid">
       <div className="d-flex justify-content-end" style={{ padding: 40 }}>
         <div style={{ position: "relative" }}>
-          <button className="btn btn-light border" onClick={handleLogout}>
-            Logout
-          </button>
+          <Logout />
         </div>
       </div>
       <h2>Admin Dashboard</h2>

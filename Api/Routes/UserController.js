@@ -38,7 +38,7 @@ router.post("/login", async (req, res) => {
       httpOnly: true,           // JavaScript cannot access it
       secure: process.env.NODE_ENV === 'production', // Use HTTPS in production
       sameSite: 'strict',       // Protection against CSRF
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+      maxAge: 24 * 60 * 60 * 1000 ,// 24 hours
     });
     
     res.status(200).json({
@@ -52,6 +52,10 @@ router.post("/login", async (req, res) => {
         // Note: No token in response body
       }
     });
+    console.log("User logged in:", user.username);
+    console.log("Token generated:", token); // Log the generated token for debugging
+    console.log("Token set in cookie");
+    console.log("Response sent to client");
   } catch (error) {
     res.status(500).json({
       status: 500,
@@ -66,16 +70,52 @@ router.post("/logout", async (req, res) => {
   try {
     // Clear the cookie
     res.clearCookie('token');
+
+    const token = req.cookies.token; // Get the token from cookies
+
+    console.log("User logged out successfully");
+
     
     res.status(200).json({
       status: 200,
-      message: "Logout successful"
+      message: "Logout successful",
+      data: {
+        message: "You have been logged out successfully",
+        pesan: "token telah dihapus = " + token
+      }
     });
   } catch (error) {
     res.status(500).json({
       status: 500,
       message: "Logout failed",
       error: error.message
+    });
+  }
+});
+
+
+router.get("/me", authenticateToken, async (req, res) => {
+  try {
+    const id = req.user.id;
+    const data = await userService.getUserById(id);
+    
+    if (!data) {
+      return res.status(404).json({
+        status: 404,
+        message: "User not found",
+      });
+    }
+    
+    res.status(200).json({
+      status: 200,
+      message: "User retrieved successfully",
+      data,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      message: "Failed to retrieve user",
+      error: error.message,
     });
   }
 });

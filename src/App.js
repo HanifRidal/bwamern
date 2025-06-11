@@ -25,6 +25,7 @@ function App() {
           <Route exact path="/login" component={LoginPage} />
           <Route exact path="/admin" component={AdminPage} />
           <Route exact path="/register" component={RegisterPage} />
+          <Route exact path="/dashboard" component={LandingPage} />
         </Switch>
       </Router>
     </div>
