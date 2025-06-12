@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import UserManagement from "../parts/UserManage";
 import VacationManagement from "../parts/VacationManage";
-import Logout from "component/Logout";
+import Logout from "elements/Logout";
 
 export default function AdminPage() {
   const [activeTab, setActiveTab] = useState("user");
@@ -10,7 +10,7 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="container-fluid mt-4">
+    <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="mb-4">Admin Dashboard</h2>
         <Logout onLogout={handleLogout} />
@@ -37,7 +37,7 @@ export default function AdminPage() {
           </li>
         </ul>
       </div>
-      
+
       <div className="card p-4">
         {activeTab === "user" && (
           <>

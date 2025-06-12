@@ -8,7 +8,7 @@ import api from "../Config/axiosconfig";
 export default function Header(props) {
   const { auth, setAuth } = useContext(AuthContext);
   console.log("Auth state:", auth); // Check auth state
-console.log("Is logged in:", auth.isLoggedIn); // Verify isLoggedIn flag
+  console.log("Is logged in:", auth.isLoggedIn); // Verify isLoggedIn flag
   const history = useHistory();
 
   const getNavLinkClass = (path) => {
@@ -17,30 +17,30 @@ console.log("Is logged in:", auth.isLoggedIn); // Verify isLoggedIn flag
 
   const handleLogout = async () => {
     try {
-      console.log("Logout clicked"); 
+      console.log("Logout clicked");
 
       await api.post("/user/logout");
-      
+
       // Clear authentication state
       setAuth({
         isLoggedIn: false,
-        user: null
+        user: null,
       });
-      
+
       // Remove token from localStorage if you're storing it there
       localStorage.removeItem("token");
-      
+
       // Redirect to homepage
       history.push("/");
     } catch (error) {
-       console.error("Logout failed", error);
-    // Still clear local state even if API call fails
-    setAuth({
-      isLoggedIn: false,
-      user: null
-    });
-    localStorage.removeItem("token");
-    history.push("/");
+      console.error("Logout failed", error);
+      // Still clear local state even if API call fails
+      setAuth({
+        isLoggedIn: false,
+        user: null,
+      });
+      localStorage.removeItem("token");
+      history.push("/");
     }
   };
 
@@ -61,29 +61,28 @@ console.log("Is logged in:", auth.isLoggedIn); // Verify isLoggedIn flag
                   Browse By
                 </Button>
               </li>
-              <li className={`nav-item ${getNavLinkClass("/vacation")}`}>
-                <Button className="nav-link" type="link" href="/vacation">
+              <li className={`nav-item ${getNavLinkClass("/properties")}`}>
+                <Button className="nav-link" type="link" href="/properties">
                   Vacation
                 </Button>
               </li>
 
-                {auth.isLoggedIn ? (
-                  <li className={`nav-item`}>
+              {auth.isLoggedIn ? (
+                <li className={`nav-item`}>
                   <Button
                     className="nav-link text-white"
-                    style={{ buttonRadius: 20 }}
                     hasShadow
-                    isDanger
+                    isPrimary
+                    type="link"
                     onClick={handleLogout}
                   >
                     Logout
                   </Button>
-                  </li>
-                ) : (
-                   <li className={`nav-item`}>
+                </li>
+              ) : (
+                <li className={`nav-item`}>
                   <Button
                     className="nav-link text-white"
-                    style={{ buttonRadius: 20 }}
                     hasShadow
                     isPrimary
                     type="link"
@@ -91,8 +90,8 @@ console.log("Is logged in:", auth.isLoggedIn); // Verify isLoggedIn flag
                   >
                     Login
                   </Button>
-                   </li>
-                )}
+                </li>
+              )}
             </ul>
           </div>
         </nav>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import api from "../Config/axiosconfig"; // Adjust this path to your axios config
-import AuthContext from '../context/AuthContext';
+import AuthContext from "../context/AuthContext";
 
 export default function UserManage() {
   const { auth } = useContext(AuthContext);
@@ -15,7 +15,6 @@ export default function UserManage() {
     fetchUsers();
     console.log("Current user:", auth.user);
     console.log("Is admin?", auth.user?.role_user === "admin");
-    
   }, [auth]);
 
   const fetchUsers = async () => {
@@ -26,9 +25,11 @@ export default function UserManage() {
       setError(null);
     } catch (err) {
       console.error("Error fetching users:", err);
-        if (err.response) {
+      if (err.response) {
         console.error("Response error:", err.response.data);
-        setError(`Failed: ${err.response.data.message || err.response.statusText}`);
+        setError(
+          `Failed: ${err.response.data.message || err.response.statusText}`
+        );
       } else {
         setError("Failed to load users. Please try again.");
       }
@@ -52,12 +53,12 @@ export default function UserManage() {
       await api.post("/user/register", {
         username: form.username,
         email: form.email,
-        password: form.password
+        password: form.password,
       });
 
       // Refresh user list
       fetchUsers();
-      
+
       // Reset form
       setForm({ username: "", email: "", password: "" });
       setError(null);
@@ -72,10 +73,10 @@ export default function UserManage() {
 
   const handleEdit = (user) => {
     setEditingId(user.id);
-    setForm({ 
-      username: user.username, 
+    setForm({
+      username: user.username,
       email: user.email,
-      password: "" // Don't set password when editing
+      password: "", // Don't set password when editing
     });
   };
 
@@ -90,12 +91,12 @@ export default function UserManage() {
       await api.put(`/user/edit`, {
         id: editingId,
         username: form.username,
-        email: form.email
+        email: form.email,
       });
 
       // Refresh user list
       fetchUsers();
-      
+
       // Reset form and editing state
       setEditingId(null);
       setForm({ username: "", email: "", password: "" });
@@ -113,9 +114,9 @@ export default function UserManage() {
     if (window.confirm("Are you sure you want to delete this user?")) {
       try {
         await api.delete(`/user/${id}`);
-        
+
         // Update local state
-        setUsers(users.filter(user => user.id !== id));
+        setUsers(users.filter((user) => user.id !== id));
       } catch (err) {
         setError("Failed to delete user");
       }
@@ -126,15 +127,20 @@ export default function UserManage() {
 
   return (
     <div className="container mt-4">
-      <h2>User Management</h2>
-      
       {error && (
-        <div className="alert alert-danger alert-dismissible fade show" role="alert">
+        <div
+          className="alert alert-danger alert-dismissible fade show"
+          role="alert"
+        >
           {error}
-          <button type="button" className="btn-close" onClick={() => setError(null)}></button>
+          <button
+            type="button"
+            className="btn-close"
+            onClick={() => setError(null)}
+          ></button>
         </div>
       )}
-      
+
       <form onSubmit={editingId ? handleUpdate : handleAdd} className="mb-4">
         <div className="row g-3">
           <div className="col-md">
@@ -188,9 +194,9 @@ export default function UserManage() {
           </div>
         </div>
       </form>
-      
+
       <table className="table table-bordered">
-        <thead>
+        <thead className="table-primary">
           <tr>
             <th style={{ width: 40 }}>#</th>
             <th>Username</th>

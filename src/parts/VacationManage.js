@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext } from "react";
 import api from "../Config/axiosconfig";
-import AuthContext from '../context/AuthContext';
+import AuthContext from "../context/AuthContext";
 
-const typeOptions = ["Beach", "Historical", "Nature", "Mountain"];
+const typeOptions = ["Beach", "Historical", "Nature"];
 
 export default function VacationManage() {
   const { auth } = useContext(AuthContext);
@@ -63,23 +63,23 @@ export default function VacationManage() {
   const prepareFormData = () => {
     const formData = new FormData();
     // Make sure the field names match what the API expects
-  formData.append("nama", form.NamaTempat); // Changed NamaTempat -> nama
-  formData.append("kota", form.Kota); // Changed Kota -> kota
-  formData.append("keterangan", form.Keterangan); // Changed Keterangan -> keterangan
-  formData.append("type", form.type);
-  formData.append("popularity", form.popularity || 0);
-  
-  // Add image files
-  if (form.Img1File) formData.append("images", form.Img1File);
-  if (form.Img2File) formData.append("images", form.Img2File);
-  if (form.Img3File) formData.append("images", form.Img3File);
-  
+    formData.append("nama", form.NamaTempat); // Changed NamaTempat -> nama
+    formData.append("kota", form.Kota); // Changed Kota -> kota
+    formData.append("keterangan", form.Keterangan); // Changed Keterangan -> keterangan
+    formData.append("type", form.type);
+    formData.append("popularity", form.popularity || 0);
+
+    // Add image files
+    if (form.Img1File) formData.append("images", form.Img1File);
+    if (form.Img2File) formData.append("images", form.Img2File);
+    if (form.Img3File) formData.append("images", form.Img3File);
+
     return formData;
   };
 
   const handleAdd = async (e) => {
     e.preventDefault();
-    
+
     // Basic validation
     if (!form.NamaTempat || !form.Kota || !form.type || !form.Img1File) {
       setError("Required fields: Name, City, Type and at least one image");
@@ -97,10 +97,10 @@ export default function VacationManage() {
 
       const response = await api.post("/wisata", formData);
       console.log("API Response:", response.data);
-      
+
       setSuccess("Vacation destination added successfully!");
       fetchVacations(); // Refresh the list
-      
+
       // Reset form
       setForm({
         NamaTempat: "",
@@ -115,16 +115,20 @@ export default function VacationManage() {
         Img2File: null,
         Img3File: null,
       });
-      
+
       // Clear success message after 3 seconds
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       console.error("Error adding vacation:", err);
-      setError("Failed to add vacation. " + (err.response?.data?.message || ""));
+      setError(
+        "Failed to add vacation. " + (err.response?.data?.message || "")
+      );
       if (err.response && err.response.data) {
         console.error("Server response:", err.response.data);
       }
-          setError("Failed to add vacation. " + (err.response?.data?.message || ""));
+      setError(
+        "Failed to add vacation. " + (err.response?.data?.message || "")
+      );
     } finally {
       setLoading(false);
     }
@@ -149,76 +153,84 @@ export default function VacationManage() {
   };
 
   const handleUpdate = async (e) => {
-  e.preventDefault();
-  
-  if (!form.NamaTempat || !form.Kota || !form.type) {
-    setError("Name, City and Type are required fields");
-    return;
-  }
+    e.preventDefault();
 
-  try {
-    setLoading(true);
-    const formData = new FormData();
-    
-    // Add text fields
-    formData.append("nama", form.NamaTempat);
-    formData.append("kota", form.Kota);
-    formData.append("keterangan", form.Keterangan || "");
-    formData.append("type", form.type);
-    formData.append("popularity", form.popularity || 0);
-    
-    // Add image ID if available
-    if (form.imageId) {
-      formData.append("imageId", form.imageId);
+    if (!form.NamaTempat || !form.Kota || !form.type) {
+      setError("Name, City and Type are required fields");
+      return;
     }
-    
-    // Add flags for which images are being updated
-    formData.append("updateImg1", form.Img1File ? "true" : "false");
-    formData.append("updateImg2", form.Img2File ? "true" : "false");
-    formData.append("updateImg3", form.Img3File ? "true" : "false");
-    
-    // Add image files
-    if (form.Img1File) formData.append("images", form.Img1File);
-    if (form.Img2File) formData.append("images", form.Img2File);
-    if (form.Img3File) formData.append("images", form.Img3File);
-    
-    await api.put(`/wisata/${editingId}`, formData);
-    
-    setSuccess("Vacation destination updated successfully!");
-    fetchVacations(); // Refresh the list
-    
-    // Reset form and editing state
-    setEditingId(null);
-    setForm({
-      NamaTempat: "",
-      Kota: "",
-      Keterangan: "",
-      type: "",
-      popularity: 0,
-      Img1: "",
-      Img2: "",
-      Img3: "",
-      Img1File: null,
-      Img2File: null,
-      Img3File: null,
-    });
+
+    try {
+      setLoading(true);
+      const formData = new FormData();
+
+      // Add text fields
+      formData.append("nama", form.NamaTempat);
+      formData.append("kota", form.Kota);
+      formData.append("keterangan", form.Keterangan || "");
+      formData.append("type", form.type);
+      formData.append("popularity", form.popularity || 0);
+
+      // Add image ID if available
+      if (form.imageId) {
+        formData.append("imageId", form.imageId);
+      }
+
+      // Add flags for which images are being updated
+      formData.append("updateImg1", form.Img1File ? "true" : "false");
+      formData.append("updateImg2", form.Img2File ? "true" : "false");
+      formData.append("updateImg3", form.Img3File ? "true" : "false");
+
+      // Add image files
+      if (form.Img1File) formData.append("images", form.Img1File);
+      if (form.Img2File) formData.append("images", form.Img2File);
+      if (form.Img3File) formData.append("images", form.Img3File);
+
+      await api.put(`/wisata/${editingId}`, formData);
+
+      setSuccess("Vacation destination updated successfully!");
+      fetchVacations(); // Refresh the list
+
+      // Reset form and editing state
+      setEditingId(null);
+      setForm({
+        NamaTempat: "",
+        Kota: "",
+        Keterangan: "",
+        type: "",
+        popularity: 0,
+        Img1: "",
+        Img2: "",
+        Img3: "",
+        Img1File: null,
+        Img2File: null,
+        Img3File: null,
+      });
     } catch (err) {
       console.error("Error updating vacation:", err);
-      setError("Failed to update vacation. " + (err.response?.data?.message || ""));
+      setError(
+        "Failed to update vacation. " + (err.response?.data?.message || "")
+      );
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this vacation destination?")) {
+    if (
+      window.confirm(
+        "Are you sure you want to delete this vacation destination?"
+      )
+    ) {
       try {
         setLoading(true);
         await api.delete(`/wisata/${id}`);
-        
+
         setSuccess("Vacation destination deleted successfully!");
-        setVacations(vacations.filter(vac => (vac.TujuanID || vac.id) !== id));
-        
+        setVacations(
+          vacations.filter((vac) => (vac.TujuanID || vac.id) !== id)
+        );
+
         // Clear success message after 3 seconds
         setTimeout(() => setSuccess(null), 3000);
       } catch (err) {
@@ -236,22 +248,34 @@ export default function VacationManage() {
 
   return (
     <div className="container mt-4">
-      <h2>Vacation Management</h2>
-      
       {error && (
-        <div className="alert alert-danger alert-dismissible fade show" role="alert">
+        <div
+          className="alert alert-danger alert-dismissible fade show"
+          role="alert"
+        >
           {error}
-          <button type="button" className="btn-close" onClick={() => setError(null)}></button>
+          <button
+            type="button"
+            className="btn-close"
+            onClick={() => setError(null)}
+          ></button>
         </div>
       )}
-      
+
       {success && (
-        <div className="alert alert-success alert-dismissible fade show" role="alert">
+        <div
+          className="alert alert-success alert-dismissible fade show"
+          role="alert"
+        >
           {success}
-          <button type="button" className="btn-close" onClick={() => setSuccess(null)}></button>
+          <button
+            type="button"
+            className="btn-close"
+            onClick={() => setSuccess(null)}
+          ></button>
         </div>
       )}
-      
+
       <form onSubmit={editingId ? handleUpdate : handleAdd} className="mb-4">
         <div className="row g-2">
           <div className="col">
@@ -329,7 +353,11 @@ export default function VacationManage() {
             />
             {form.Img1 && (
               <img
-                src={form.Img1.startsWith('blob:') ? form.Img1 : `http://localhost:3001${form.Img1}`}
+                src={
+                  form.Img1.startsWith("blob:")
+                    ? form.Img1
+                    : `http://localhost:3001${form.Img1}`
+                }
                 alt="Preview 1"
                 style={{ height: 60, marginTop: 4 }}
               />
@@ -346,7 +374,11 @@ export default function VacationManage() {
             />
             {form.Img2 && (
               <img
-                src={form.Img2.startsWith('blob:') ? form.Img2 : `http://localhost:3001${form.Img2}`}
+                src={
+                  form.Img2.startsWith("blob:")
+                    ? form.Img2
+                    : `http://localhost:3001${form.Img2}`
+                }
                 alt="Preview 2"
                 style={{ height: 60, marginTop: 4 }}
               />
@@ -363,7 +395,11 @@ export default function VacationManage() {
             />
             {form.Img3 && (
               <img
-                src={form.Img3.startsWith('blob:') ? form.Img3 : `http://localhost:3001${form.Img3}`}
+                src={
+                  form.Img3.startsWith("blob:")
+                    ? form.Img3
+                    : `http://localhost:3001${form.Img3}`
+                }
                 alt="Preview 3"
                 style={{ height: 60, marginTop: 4 }}
               />
@@ -372,19 +408,24 @@ export default function VacationManage() {
         </div>
         <div className="row mt-3">
           <div className="col">
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="btn btn-primary"
               disabled={loading}
             >
               {loading ? (
                 <span>
-                  <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                  {' '}
+                  <span
+                    className="spinner-border spinner-border-sm"
+                    role="status"
+                    aria-hidden="true"
+                  ></span>{" "}
                   {editingId ? "Updating..." : "Adding..."}
                 </span>
+              ) : editingId ? (
+                "Update"
               ) : (
-                editingId ? "Update" : "Add"
+                "Add"
               )}
             </button>
             {editingId && (
@@ -414,10 +455,10 @@ export default function VacationManage() {
           </div>
         </div>
       </form>
-      
+
       <div className="table-responsive">
         <table className="table table-bordered table-hover">
-          <thead className="table-light">
+          <thead className="table-primary">
             <tr>
               <th style={{ width: "40px" }}>#</th>
               <th>Nama Tempat</th>
@@ -447,28 +488,28 @@ export default function VacationManage() {
                   <td>{vac.Popularity || 0}/5</td>
                   <td>
                     {vac.ImgUrl && (
-                      <img 
-                        src={`${vac.ImgUrl}`} 
-                        alt="" 
-                        style={{ width: 60, height: 40, objectFit: 'cover' }} 
+                      <img
+                        src={`${vac.ImgUrl}`}
+                        alt=""
+                        style={{ width: 60, height: 40, objectFit: "cover" }}
                       />
                     )}
                   </td>
                   <td>
                     {vac.Url_1 && (
-                      <img 
-                        src={`${vac.Url_1}`} 
-                        alt="" 
-                        style={{ width: 60, height: 40, objectFit: 'cover' }} 
+                      <img
+                        src={`${vac.Url_1}`}
+                        alt=""
+                        style={{ width: 60, height: 40, objectFit: "cover" }}
                       />
                     )}
                   </td>
                   <td>
                     {vac.Url_2 && (
-                      <img 
-                        src={`${vac.Url_2}`} 
-                        alt="" 
-                        style={{ width: 60, height: 40, objectFit: 'cover' }} 
+                      <img
+                        src={`${vac.Url_2}`}
+                        alt=""
+                        style={{ width: 60, height: 40, objectFit: "cover" }}
                       />
                     )}
                   </td>
@@ -486,7 +527,7 @@ export default function VacationManage() {
                         onClick={() => handleDelete(vac.TujuanID || vac.id)}
                         disabled={loading}
                       >
-                        <i className="bi bi-trash"></i>
+                        <i className="bi bi-trash"></i>Delete
                       </button>
                     </div>
                   </td>

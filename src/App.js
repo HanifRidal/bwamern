@@ -9,6 +9,7 @@ import Cbf from "pages/CbfPage";
 import AdminPage from "pages/AdminPage";
 import LoginPage from "pages/LoginPage";
 import RegisterPage from "pages/RegisterPage";
+import VacationPage from "pages/VacationPage";
 
 const history = createBrowserHistory({
   basename: process.env.PUBLIC_URL,
@@ -21,6 +22,7 @@ function App() {
         <Switch>
           <Route exact path="/" component={LandingPage} />
           <Route path="/browse-by" component={Cbf} />
+          <Route exact path="/properties" component={VacationPage} />
           <Route exact path="/properties/:id" component={DetailsPage} />
           <Route exact path="/login" component={LoginPage} />
           <Route exact path="/admin" component={AdminPage} />
