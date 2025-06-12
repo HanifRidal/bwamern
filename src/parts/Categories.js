@@ -51,7 +51,9 @@ const PemesanList = () => {
                   className="mb-1 font-weight-medium"
                   style={{ width: "fit-content" }}
                 >
-                  <h5 className="mb-2">{type}</h5>
+                  <div className="badge badge-primary">
+                    <h5 className="mb-2">{type}</h5>
+                  </div>
                 </div>
               </div>
               {groupedByType[type].map((item) => (

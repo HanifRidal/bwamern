@@ -64,7 +64,7 @@ router.get("/TypeWisata", async (req, res) => {
 router.get("/Type", async (req, res) => {
   try {
     const types = ["Beach", "Historical"];
-    const limitPerType = 3;
+    const limitPerType = 6;
     const data = await tujuanWisataService.getLimitedWisataByTypes(types, limitPerType);
     res.json({ status: 200, data });
   } catch (error) {
@@ -203,7 +203,17 @@ router.post("/", authenticateToken, requireRole(["admin"]), upload.array("images
 router.put("/:id", authenticateToken, requireRole(["admin"]), upload.array("images", 3), async (req, res) => {
   try {
     const id = req.params.id;
-    const { nama, kota, keterangan, type, popularity, imageId } = req.body;
+    const { 
+      nama, 
+      kota, 
+      keterangan, 
+      type, 
+      popularity, 
+      imageId, 
+      updateImg1, 
+      updateImg2, 
+      updateImg3 
+    } = req.body;
     
     // Get the existing destination to find current images
     const existingDestination = await tujuanWisataService.getDestinationById(id);
@@ -222,36 +232,44 @@ router.put("/:id", authenticateToken, requireRole(["admin"]), upload.array("imag
       keterangan,
       type,
       popularity: parseInt(popularity) || existingDestination.Popularity,
+      imgUrl: existingDestination.ImgUrl 
     };
     
     // Handle image updates if new images are uploaded
-    let imageData = null;
+    let imageData = {
+      imageId: existingDestination.ImageID || imageId,
+      url1: existingDestination.Url_1,
+      url2: existingDestination.Url_2
+    };
     
+    // Use flags from frontend to know which images to update
     if (req.files && req.files.length > 0) {
-      // Update the main image if a new one is uploaded
-      destinationData.imgUrl = `/images/${req.files[0].filename}`;
+      let fileIndex = 0;
       
-      // If there are additional images, update url1 and url2
-      let url1 = existingDestination.Url_1;
-      let url2 = existingDestination.Url_2;
-      
-      if (req.files.length > 1) {
-        url1 = `/images/${req.files[1].filename}`;
+      // Update main image if requested
+      if (updateImg1 === 'true' && fileIndex < req.files.length) {
+        destinationData.imgUrl = `/images/${req.files[fileIndex].filename}`;
+        fileIndex++;
       }
       
-      if (req.files.length > 2) {
-        url2 = `/images/${req.files[2].filename}`;
+      // Update url1 if requested
+      if (updateImg2 === 'true' && fileIndex < req.files.length) {
+        imageData.url1 = `/images/${req.files[fileIndex].filename}`;
+        fileIndex++;
       }
       
-      imageData = {
-        imageId: existingDestination.ImageID || imageId,
-        url1,
-        url2
-      };
-    } else {
-      // Keep the existing image URL if no new image
-      destinationData.imgUrl = existingDestination.ImgUrl;
+      // Update url2 if requested
+      if (updateImg3 === 'true' && fileIndex < req.files.length) {
+        imageData.url2 = `/images/${req.files[fileIndex].filename}`;
+      }
     }
+
+    console.log("Update request details:");
+    console.log("- Files:", req.files ? req.files.length : 0);
+    console.log("- Update flags:", { updateImg1, updateImg2, updateImg3 });
+    console.log("- destinationData:", destinationData);
+    console.log("- imageData:", imageData);
+    
     
     await tujuanWisataService.updateDestination(id, destinationData, imageData);
     
@@ -259,21 +277,21 @@ router.put("/:id", authenticateToken, requireRole(["admin"]), upload.array("imag
       status: 200,
       message: "Destination updated successfully",
     });
-  } catch (error) {
-    // If there's an error, delete any uploaded files
-    if (req.files && req.files.length > 0) {
-      req.files.forEach(file => {
-        fs.unlinkSync(file.path);
+    } catch (error) {
+      // If there's an error, delete any uploaded files
+      if (req.files && req.files.length > 0) {
+        req.files.forEach(file => {
+          fs.unlinkSync(file.path);
+        });
+      }
+      
+      res.status(500).json({
+        status: 500,
+        message: "Failed to update destination",
+        error: error.message,
       });
     }
-    
-    res.status(500).json({
-      status: 500,
-      message: "Failed to update destination",
-      error: error.message,
-    });
-  }
-});
+  });
 
 // Delete a destination
 router.delete("/:id", authenticateToken, requireRole(["admin"]), async (req, res) => {

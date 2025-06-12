@@ -149,49 +149,59 @@ export default function VacationManage() {
   };
 
   const handleUpdate = async (e) => {
-    e.preventDefault();
-    
-    if (!form.NamaTempat || !form.Kota || !form.type) {
-      setError("Name, City and Type are required fields");
-      return;
-    }
+  e.preventDefault();
+  
+  if (!form.NamaTempat || !form.Kota || !form.type) {
+    setError("Name, City and Type are required fields");
+    return;
+  }
 
-    try {
-      setLoading(true);
-      const formData = prepareFormData();
-      
-      // Add image ID if available
-      if (form.imageId) {
-        formData.append("imageId", form.imageId);
-      }
-      
-      await api.put(`/wisata/${editingId}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-      
-      setSuccess("Vacation destination updated successfully!");
-      fetchVacations(); // Refresh the list
-      
-      // Reset form and editing state
-      setEditingId(null);
-      setForm({
-        NamaTempat: "",
-        Kota: "",
-        Keterangan: "",
-        type: "",
-        popularity: 0,
-        Img1: "",
-        Img2: "",
-        Img3: "",
-        Img1File: null,
-        Img2File: null,
-        Img3File: null,
-      });
-      
-      // Clear success message after 3 seconds
-      setTimeout(() => setSuccess(null), 3000);
+  try {
+    setLoading(true);
+    const formData = new FormData();
+    
+    // Add text fields
+    formData.append("nama", form.NamaTempat);
+    formData.append("kota", form.Kota);
+    formData.append("keterangan", form.Keterangan || "");
+    formData.append("type", form.type);
+    formData.append("popularity", form.popularity || 0);
+    
+    // Add image ID if available
+    if (form.imageId) {
+      formData.append("imageId", form.imageId);
+    }
+    
+    // Add flags for which images are being updated
+    formData.append("updateImg1", form.Img1File ? "true" : "false");
+    formData.append("updateImg2", form.Img2File ? "true" : "false");
+    formData.append("updateImg3", form.Img3File ? "true" : "false");
+    
+    // Add image files
+    if (form.Img1File) formData.append("images", form.Img1File);
+    if (form.Img2File) formData.append("images", form.Img2File);
+    if (form.Img3File) formData.append("images", form.Img3File);
+    
+    await api.put(`/wisata/${editingId}`, formData);
+    
+    setSuccess("Vacation destination updated successfully!");
+    fetchVacations(); // Refresh the list
+    
+    // Reset form and editing state
+    setEditingId(null);
+    setForm({
+      NamaTempat: "",
+      Kota: "",
+      Keterangan: "",
+      type: "",
+      popularity: 0,
+      Img1: "",
+      Img2: "",
+      Img3: "",
+      Img1File: null,
+      Img2File: null,
+      Img3File: null,
+    });
     } catch (err) {
       console.error("Error updating vacation:", err);
       setError("Failed to update vacation. " + (err.response?.data?.message || ""));
