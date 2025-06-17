@@ -73,6 +73,23 @@ router.get("/Type", async (req, res) => {
   }
 });
 
+router.get("/Get", async (req, res) => {
+  try {
+    const data = await tujuanWisataService.getAllDestinations();
+    res.status(200).json({
+      status: 200,
+      message: "Destinations retrieved successfully",
+      data,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      message: "Failed to retrieve destinations",
+      error: error.message,
+    });
+  }
+});
+
 // Get all destinations
 router.get("/", authenticateToken, async (req, res) => {
   try {
@@ -92,7 +109,7 @@ router.get("/", authenticateToken, async (req, res) => {
 });
 
 // Get destination by ID
-router.get("/:id", authenticateToken, async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
     const id = req.params.id;
     const data = await tujuanWisataService.getDestinationById(id);

@@ -1,8 +1,8 @@
 import React from "react";
+import itemDetails from "json/itemDetails.json";
 
 export default function PageDetailDescription({ data }) {
-  // Ambil fitur dari data.features
-  const features = Array.isArray(data?.features) ? data.features : [];
+  // Use description from the fetched wisata data
   const description = data?.description || "";
 
   return (
@@ -10,9 +10,9 @@ export default function PageDetailDescription({ data }) {
       <h4>About the place</h4>
       <p>{description}</p>
       <div className="row" style={{ marginTop: 30 }}>
-        {features.length === 0
+        {itemDetails.features?.length === 0
           ? "Tidak Ada Feature"
-          : features.map((feature, index) => (
+          : itemDetails.features?.map((feature, index) => (
               <div
                 key={`feature-${index}`}
                 className="col-3"

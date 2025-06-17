@@ -5,6 +5,7 @@ import MostPicked from "parts/MostPicked";
 import Categories from "parts/Categories";
 import Testimony from "parts/Testimony";
 import Footer from "parts/Footer";
+import ListWisata from "parts/ListWisata";
 
 import landingPage from "json/landingPage.json";
 
@@ -22,7 +23,7 @@ export default class Vacation extends Component {
           refMostPicked={this.refMostPicked}
           data={landingPage.mostPicked}
         />
-        <Categories />
+        <ListWisata />
         <Footer />
       </>
     );

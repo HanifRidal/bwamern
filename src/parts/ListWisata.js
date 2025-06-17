@@ -11,7 +11,7 @@ const PemesanList = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:3001/Api/wisata/Type"
+          "http://localhost:3001/Api/wisata/Get"
         );
         setPemesan(response.data.data);
       } catch (error) {
@@ -77,7 +77,7 @@ const PemesanList = () => {
                       <Button
                         type="link"
                         className="stretched-link d-block text-gray-800"
-                        href={`/Wisata/${item.TujuanID}`}
+                        href={`/properties/${item.TujuanID}`}
                       >
                         <h5 className="h4">{item.NamaTempat}</h5>
                       </Button>

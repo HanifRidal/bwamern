@@ -23,7 +23,7 @@ function App() {
           <Route exact path="/" component={LandingPage} />
           <Route path="/browse-by" component={Cbf} />
           <Route exact path="/properties" component={VacationPage} />
-          <Route exact path="/properties/:id" component={DetailsPage} />
+          <Route exact path="/Wisata/:id" component={DetailsPage} />
           <Route exact path="/login" component={LoginPage} />
           <Route exact path="/admin" component={AdminPage} />
           <Route exact path="/register" component={RegisterPage} />
